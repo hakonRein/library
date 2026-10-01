@@ -24,20 +24,37 @@ function removeBookFromLibrary(id) {
     }
 }
 
+/* Access DOM-objects */
+
+const newButton = document.querySelector("#new-button");
+const main = document.querySelector("#main");
+
+newButton.addEventListener("click", () => {
+    addBookToLibrary("Bible", "God", 900, "Religion");
+    displayBooks();
+})
+
 /* Rendering code */
 
 function displayBooks() {
+    let html = "";
     for (let book of myLibrary) {
-        // Render books
-
-        console.log(`${book.id}: ${book.title} by ${book.author} has ${book.pages} pages, and is of genre ${book.genre}`);
+        html += `
+            <div class="book">
+                <h2>${book.title}</h2>
+                <p>Author: ${book.author}</p>
+                <p>Number of pages: ${book.pages}</p>
+                <p>Genre: ${book.genre}</p>
+            </div> 
+        `;
     }
+    main.innerHTML = html;
 }
-
 
 
 /* Testing code */
 
+/*
 addBookToLibrary("Bible", "God", 900, "Religion");
 addBookToLibrary("The Lord of the Rings", "J.R.R. Tolkien", 1000, "Fantasy");
 addBookToLibrary("Frelseren", "Jo Nesbø", 400, "Crime");
@@ -47,3 +64,4 @@ displayBooks();
 removeBookFromLibrary(myLibrary[1].id);
 
 displayBooks();
+*/
