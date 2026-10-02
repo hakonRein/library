@@ -8,6 +8,11 @@ function Book(title, author, pages, genre) {
     this.author = author;
     this.pages = pages;
     this.genre = genre;
+    this.read = true;
+}
+
+Book.prototype.toggleRead = function() {
+    this.read = !this.read;
 }
 
 function addBookToLibrary(title, author, pages, genre) {
@@ -21,17 +26,67 @@ function removeBookFromLibrary(id) {
     })
     if (bookIndex != -1) {
         myLibrary.splice(bookIndex, 1);
+        displayBooks();
     }
-    displayBooks();
+}
+
+function setReadStatus(id) {
+    const bookIndex = myLibrary.findIndex( (book) => {
+        return book.id === id;
+    })
+    if (bookIndex != -1) {
+        myLibrary[bookIndex].toggleRead();
+        displayBooks();
+    }
+    
 }
 
 /* Access DOM-objects */
 
-const newButton = document.querySelector("#new-button");
+const submitButton = document.querySelector("#submit-button");
+const sortTitleButton = document.querySelector("#sort-title");
+const sortAuthorButton = document.querySelector("#sort-author");
+const exampleBooksButton = document.querySelector("#example-books");
+
 const main = document.querySelector("#main");
 
-newButton.addEventListener("click", () => {
-    addBookToLibrary("Bible", "God", 900, "Religion");
+const newBookDialog = document.querySelector("#new-book-dialog");
+const newBookForm = document.querySelector("#new-book-form");
+const titleInput = document.querySelector("#title");
+const authorInput = document.querySelector("#author");
+const pagesInput = document.querySelector("#pages");
+const genreInput = document.querySelector("#genre");
+
+
+submitButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    const title = titleInput.value;
+    const author = authorInput.value;
+    const pages = pagesInput.value;
+
+    const genreIndex = genreInput.selectedIndex;
+    const genre = genreInput.options[genreIndex].text;
+
+    addBookToLibrary(title, author, pages, genre);
+    newBookForm.reset();
+    newBookDialog.close();
+    displayBooks();
+});
+
+exampleBooksButton.addEventListener("click", () => {
+    myLibrary.push(...exampleLibrary);
+    displayBooks();
+});
+
+sortTitleButton.addEventListener("click", () => {
+    myLibrary.sort( (book1, book2) => 
+        book1.title > book2.title ? 1 : -1 );
+    displayBooks();
+});
+
+sortAuthorButton.addEventListener("click", () => {
+    myLibrary.sort( (book1, book2) => 
+        book1.author > book2.author ? 1 : -1 );
     displayBooks();
 })
 
@@ -40,18 +95,16 @@ newButton.addEventListener("click", () => {
 function displayBooks() {
     main.innerHTML = "";
 
-    for (let book of myLibrary) {
+    for (const book of myLibrary) {
         const bookElement = document.createElement("div");
         bookElement.classList.add("book");
 
         const titleElement = document.createElement("h2");
         titleElement.textContent = book.title;
-        const authorElement = document.createElement("p");
-        authorElement.textContent = "Author: " + book.author;
-        const pagesElement = document.createElement("p");
-        pagesElement.textContent = "Number of pages: " + book.pages;
-        const genreElement = document.createElement("p");
-        genreElement.textContent = "Genre: " + book.genre;
+
+        const authorElement = createBookElement("Author:", book.author);
+        const pagesElement = createBookElement("Pages:", book.pages);
+        const genreElement = createBookElement("Genre:", book.genre);
         
         const removeBtn = document.createElement("button");
         removeBtn.classList.add("remove-button");
@@ -61,15 +114,38 @@ function displayBooks() {
             removeBookFromLibrary(event.target.dataset.id);
         });
 
+        const readBtn = document.createElement("button");
+        readBtn.classList.add("read-button");
+        const readImage = document.createElement("img");
+        readImage.setAttribute("src", `images/${book.read ? "book-open-outline.svg" : "book.svg"}`);
+        readImage.setAttribute("data-id", book.id);
+        readBtn.appendChild(readImage);
+        readBtn.addEventListener("click", (event) => {
+            setReadStatus(event.target.dataset.id);
+        })
+
         bookElement.appendChild(titleElement);
         bookElement.appendChild(authorElement);
         bookElement.appendChild(pagesElement);
         bookElement.appendChild(genreElement);
         bookElement.appendChild(removeBtn);
+        bookElement.appendChild(readBtn);
         
         main.appendChild(bookElement);
     }
 
+}
+
+function createBookElement(label, value) {
+    const elementDiv = document.createElement("div");
+    elementDiv.classList.add("book-element");
+    const labelElement = document.createElement("p");
+    labelElement.textContent = label;
+    const valueElement = document.createElement("p");
+    valueElement.textContent = value;
+    elementDiv.appendChild(labelElement);
+    elementDiv.appendChild(valueElement);
+    return elementDiv;
 }
 
 
@@ -86,3 +162,11 @@ removeBookFromLibrary(myLibrary[1].id);
 
 displayBooks();
 */
+
+/* Static book library */
+
+const exampleLibrary = [
+    new Book("Bible", "God", 900, "Religion"),
+    new Book("Lord of the Rings", "JRR Tolkien", 1000, "Fantasy"),
+    new Book("Frelseren", "Jo Nesbø", 400, "Crime")
+]
