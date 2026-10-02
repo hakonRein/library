@@ -20,8 +20,9 @@ function removeBookFromLibrary(id) {
         return book.id === id;
     })
     if (bookIndex != -1) {
-        myLibrary.splice(bookIndex, bookIndex);
+        myLibrary.splice(bookIndex, 1);
     }
+    displayBooks();
 }
 
 /* Access DOM-objects */
@@ -37,18 +38,38 @@ newButton.addEventListener("click", () => {
 /* Rendering code */
 
 function displayBooks() {
-    let html = "";
+    main.innerHTML = "";
+
     for (let book of myLibrary) {
-        html += `
-            <div class="book">
-                <h2>${book.title}</h2>
-                <p>Author: ${book.author}</p>
-                <p>Number of pages: ${book.pages}</p>
-                <p>Genre: ${book.genre}</p>
-            </div> 
-        `;
+        const bookElement = document.createElement("div");
+        bookElement.classList.add("book");
+
+        const titleElement = document.createElement("h2");
+        titleElement.textContent = book.title;
+        const authorElement = document.createElement("p");
+        authorElement.textContent = "Author: " + book.author;
+        const pagesElement = document.createElement("p");
+        pagesElement.textContent = "Number of pages: " + book.pages;
+        const genreElement = document.createElement("p");
+        genreElement.textContent = "Genre: " + book.genre;
+        
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove-button");
+        removeBtn.setAttribute("data-id", book.id);
+        removeBtn.textContent = "X";
+        removeBtn.addEventListener("click", (event) => {
+            removeBookFromLibrary(event.target.dataset.id);
+        });
+
+        bookElement.appendChild(titleElement);
+        bookElement.appendChild(authorElement);
+        bookElement.appendChild(pagesElement);
+        bookElement.appendChild(genreElement);
+        bookElement.appendChild(removeBtn);
+        
+        main.appendChild(bookElement);
     }
-    main.innerHTML = html;
+
 }
 
 
