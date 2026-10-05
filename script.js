@@ -13,7 +13,7 @@ class Book {
         this.read = false;
     }
 
-    toggleRead: function() {
+    toggleRead() {
         this.read = !this.read;
     }
 }
